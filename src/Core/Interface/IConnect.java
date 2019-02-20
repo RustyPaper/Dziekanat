@@ -1,9 +1,11 @@
 package Core.Interface;
 
+import Core.DBConnect.Connect;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public interface IConnect {
-    void load(ResultSet resultSet) throws SQLException;
+    void load(Connect connect, ResultSet resultSet) throws SQLException;
     String save();
 }

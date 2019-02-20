@@ -1,26 +1,40 @@
 package Core;
 
+import Core.DBConnect.Connect;
+import Core.DBConnect.NazwyTablic;
 import Core.Interface.IListaStudentow;
 import Core.Interface.IConnect;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class KierunekStudiow implements IListaStudentow, IConnect {
 
+    private int idKierunku;
     private String nazwaKierunku;
     private int progWejsciowy;
     private List<Integer> listaStudentow;
-    private ArrayList<Przedmiot> listaPrzedmiotow;
+    private ArrayList<Integer> listaPrzedmiotow;
+    private Map<Integer, List<Przedmiot>> listaOcen;
     private TypStudiow typStudiow;
+
+    public Map<Integer, List<Przedmiot>> getListaOcen() {
+        return listaOcen;
+    }
+
+    public void setListaOcen(Map<Integer, List<Przedmiot>> listaOcen) {
+        this.listaOcen = listaOcen;
+    }
 
     public KierunekStudiow(){
 
         this.listaStudentow = new ArrayList<>();
         this.listaPrzedmiotow = new ArrayList<>();
-
+        this.listaOcen = new HashMap<>();
     }
 
     public KierunekStudiow(String nazwaKierunku,
@@ -30,26 +44,24 @@ public class KierunekStudiow implements IListaStudentow, IConnect {
         this.progWejsciowy = progWejsciowy;
         this.listaStudentow = new ArrayList<>();
         this.listaPrzedmiotow = new ArrayList<>();
+        this.listaOcen = new HashMap<>();
         this.typStudiow = typStudiow;
     }
 
-    public void dodajPrzedmiot(Przedmiot przedmiot) {
+    public int getIdKierunku() {
+        return idKierunku;
+    }
 
-        this.listaPrzedmiotow.add(przedmiot);
+    public void setIdKierunku(int idKierunku) {
+        this.idKierunku = idKierunku;
+    }
+
+    public void dodajPrzedmiot(int idPrzedmiotu) {
+
+        this.listaPrzedmiotow.add(idPrzedmiotu);
 
     }
 
-    public List<Przedmiot> wyszukajPrzedmiot(String nazwa){
-
-        ArrayList<Przedmiot> wynikWyszukiwania = new ArrayList<>();
-        for (Przedmiot przedmiot: this.listaPrzedmiotow){
-            if (przedmiot.getNazwaPrzedmiotu() == nazwa){
-                wynikWyszukiwania.add(przedmiot);
-            }
-        }
-
-        return wynikWyszukiwania;
-    }
 
     public String getNazwaKierunku() {
         return nazwaKierunku;
@@ -67,7 +79,7 @@ public class KierunekStudiow implements IListaStudentow, IConnect {
         this.progWejsciowy = progWejsciowy;
     }
 
-    public ArrayList<Przedmiot> getListaPrzedmiotow() {
+    public ArrayList<Integer> getListaPrzedmiotow() {
         return listaPrzedmiotow;
     }
 
@@ -86,19 +98,38 @@ public class KierunekStudiow implements IListaStudentow, IConnect {
 
 
     @Override
-    public void load(ResultSet resultSet) throws SQLException {
+    public void load(Connect connect, ResultSet resultSet) throws SQLException {
+        this.setIdKierunku(resultSet.getInt(1));
         this.setNazwaKierunku(resultSet.getString(2));
         this.setProgWejsciowy(resultSet.getInt(3));
+
+        String[] idPrzedmiotow = resultSet.getString(5).split(";");
+        for(String idPrzedmiotu: idPrzedmiotow)
+            this.listaPrzedmiotow.add(Integer.parseInt(idPrzedmiotu));
+
         String[] indeksyStudentow = resultSet.getString(4).split(";");
+        Przedmiot przedmiot;
         for (String indeks: indeksyStudentow){
             this.listaStudentow.add(Integer.parseInt(indeks));
+            this.listaOcen.put(Integer.parseInt(indeks), new ArrayList<>());
+            for(int idPrzedmiotu: this.listaPrzedmiotow) {
+                przedmiot = new Przedmiot();
+                String[] listaOcenZBazy = connect.getColumn("oceny","oceny","WHERE numer_indeksu = " + indeks + " AND id_przedmiotu = "+idPrzedmiotu);
+
+                connect.laduj(przedmiot, NazwyTablic.PRZEDMIOTY.getNazwa(),"WHERE id = "+idPrzedmiotu);
+                if(listaOcenZBazy.length >0 ) {
+                    przedmiot.setListaOcen(listaOcenZBazy[0].split(";"));
+
+                    this.listaOcen.get(Integer.parseInt(indeks)).add(przedmiot);
+                }
+            }
         }
     }
 
     @Override
     public String save() {
         StringBuilder queryWartosci = new StringBuilder();
-        queryWartosci.append("(");
+        queryWartosci.append("(nazwa_kierunku, prog_wejsciowy, lista_studentow, lista_przedmiotow, typ_studiow) VALUES(");
         queryWartosci.append("'"+this.getNazwaKierunku()+"',");
         queryWartosci.append("'"+this.getProgWejsciowy()+"',");
         for (int indeks: getListaStudentow()){

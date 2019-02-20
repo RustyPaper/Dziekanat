@@ -2,7 +2,9 @@ package Core.DBConnect;
 
 public enum NazwyTablic {
     STUDENCI("studenci"),
-    ROCZNIKI("roczniki");
+    ROCZNIKI("roczniki"),
+    PRZEDMIOTY("przedmioty"),
+    WYKLADOWCY("wykladowcy");
 
     private String nazwa;
 

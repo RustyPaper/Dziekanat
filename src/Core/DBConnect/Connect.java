@@ -44,7 +44,7 @@ public class Connect {
 
         try {
             this.resultSet.next();
-            loaderInterface.load(this.resultSet);
+            loaderInterface.load(this,this.resultSet);
             this.st.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -75,14 +75,18 @@ public class Connect {
         return wynikArr;
     }
 
-    public void save(IConnect inst, String nazwaTab){
-        String query = "INSERT INTO "+nazwaTab+" "+inst.save();
+    public int save(IConnect inst, String nazwaTab){
+        String query = "INSERT INTO "+nazwaTab+inst.save()+" RETURNING id";
         try {
             this.st = conn.prepareStatement(query);
-            this.st.executeUpdate();
+            this.resultSet = this.st.executeQuery();
+            resultSet.next();
+            return resultSet.getInt(1);
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        return -1;
     }
 }

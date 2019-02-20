@@ -1,5 +1,6 @@
 package Core;
 
+import Core.DBConnect.Connect;
 import Core.Interface.IConnect;
 
 import java.sql.ResultSet;
@@ -24,15 +25,13 @@ public class Student implements IConnect {
                    String adresZamieszkania,
                    String email,
                    long pesel,
-                   int numerTelefonu,
-                   int numerIndeksu) {
+                   int numerTelefonu) {
         this.imie = imie;
         this.nazwisko = nazwisko;
         this.adresZamieszkania = adresZamieszkania;
         this.email = email;
         this.pesel = pesel;
         this.numerTelefonu = numerTelefonu;
-        this.numerIndeksu = numerIndeksu;
     }
 
     public String getImie() {
@@ -92,20 +91,20 @@ public class Student implements IConnect {
     }
 
     @Override
-    public void load(ResultSet resultSet) throws SQLException {
+    public void load(Connect connect, ResultSet resultSet) throws SQLException {
         this.setImie(resultSet.getString(2));
         this.setNazwisko(resultSet.getString(3));
         this.setAdresZamieszkania(resultSet.getString(4));
         this.setPesel(Long.parseLong(resultSet.getString(5)));
         this.setEmail(resultSet.getString(6));
         this.setNumerTelefonu(Integer.parseInt(resultSet.getString(7)));
-        this.setNumerIndeksu(Integer.parseInt(resultSet.getString(8)));
+        this.setNumerIndeksu(Integer.parseInt(resultSet.getString(1)));
     }
 
     @Override
     public String save() {
         StringBuilder queryWartosci = new StringBuilder();
-        queryWartosci.append("(");
+        queryWartosci.append("(imie, nazwisko, adres_zamieszkania, pesel, email, numer_telefonu, numer_indeksu) VALUES(");
         queryWartosci.append("'"+this.getImie()+"',");
         queryWartosci.append("'"+this.getNazwisko()+"',");
         queryWartosci.append("'"+this.getAdresZamieszkania()+"',");

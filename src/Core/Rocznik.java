@@ -1,5 +1,6 @@
 package Core;
 
+import Core.DBConnect.Connect;
 import Core.Interface.IConnect;
 
 import java.sql.ResultSet;
@@ -42,7 +43,7 @@ public class Rocznik implements IConnect {
     }
 
     @Override
-    public void load(ResultSet resultSet) throws SQLException {
+    public void load(Connect connect, ResultSet resultSet) throws SQLException {
         this.setNumerRocznika(resultSet.getInt(2));
         String[] idKierunkow = resultSet.getString(3).split(";");
         for (String id: idKierunkow){
@@ -53,7 +54,7 @@ public class Rocznik implements IConnect {
     @Override
     public String save() {
         StringBuilder queryWartosci = new StringBuilder();
-        queryWartosci.append("(");
+        queryWartosci.append("(numer_rocznika, lista_kierunkow) VALUES(");
         queryWartosci.append("'"+this.getNumerRocznika()+"',");
         for (int indeks: getListaKierunkow()){
             queryWartosci.append("'"+indeks+"',");

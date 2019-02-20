@@ -19,10 +19,11 @@ public class Dzik {
 
 
         //System.out.println(dziekanat.wyswietlKierunekStudiow());
-        dziekanat.getRocznik(2018);
-        dziekanat.getKierunek("Informatyka");
         try {
-            System.out.println(dziekanat.wyswietlKierunekStudiow());
+           dziekanat.getRocznik(2017);
+           dziekanat.getKierunek("Informatyka");
+           float srednia = dziekanat.jakaJestSredniaOcenaZPrzedmiotu(1,"Podstawy Systemow Informatycznych");
+           System.out.println(srednia);
 
         } catch (Exception e) {
             e.printStackTrace();

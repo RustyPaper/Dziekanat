@@ -1,17 +1,23 @@
 package Core;
 
+import Core.DBConnect.Connect;
 import Core.Interface.IConnect;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Wykladowca implements IConnect {
+        private int idWykladowcy;
         private String imie;
         private String nazwisko;
         private String adresZamieszkania;
         private String email;
         private long pesel;
         private float zarobki;
+
+        public Wykladowca(){
+
+        }
 
     public Wykladowca(String imie,
                       String nazwisko,
@@ -25,6 +31,14 @@ public class Wykladowca implements IConnect {
         this.email = email;
         this.pesel = pesel;
         this.zarobki = zarobki;
+    }
+
+    public int getIdWykladowcy() {
+        return idWykladowcy;
+    }
+
+    public void setIdWykladowcy(int idWykladowcy) {
+        this.idWykladowcy = idWykladowcy;
     }
 
     public String getImie() {
@@ -76,19 +90,20 @@ public class Wykladowca implements IConnect {
     }
 
     @Override
-    public void load(ResultSet resultSet) throws SQLException {
-        this.setImie(resultSet.getString(1));
-        this.setNazwisko(resultSet.getString(2));
-        this.setAdresZamieszkania(resultSet.getString(3));
-        this.setEmail(resultSet.getString(4));
-        this.setPesel(Long.parseLong(resultSet.getString(5)));
-        this.setZarobki(Float.parseFloat(resultSet.getString(6)));
+    public void load(Connect connect,ResultSet resultSet) throws SQLException {
+        this.setIdWykladowcy(resultSet.getInt(1));
+        this.setImie(resultSet.getString(2));
+        this.setNazwisko(resultSet.getString(3));
+        this.setAdresZamieszkania(resultSet.getString(4));
+        this.setEmail(resultSet.getString(5));
+        this.setPesel(Long.parseLong(resultSet.getString(6)));
+        this.setZarobki(Float.parseFloat(resultSet.getString(7)));
     }
 
     @Override
     public String save() {
         StringBuilder queryWartosci = new StringBuilder();
-        queryWartosci.append("(");
+        queryWartosci.append("(imie, nazwisko, adres_zamieszkania, email, pesel, zarobki) VALUES(");
         queryWartosci.append("'"+this.getImie()+"',");
         queryWartosci.append("'"+this.getNazwisko()+"',");
         queryWartosci.append("'"+this.getAdresZamieszkania()+"',");

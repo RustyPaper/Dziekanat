@@ -3,6 +3,10 @@ package Core;
 import Core.DBConnect.Connect;
 import Core.DBConnect.NazwyTablic;
 
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+
 public class Dziekanat {
 
     private Student student;
@@ -21,15 +25,17 @@ public class Dziekanat {
                               String adresZamieszkania,
                               String email,
                               long pesel,
-                              int numerTelefonu,
-                              int numerIndeksu){
+                              int numerTelefonu){
         student = new Student(imie,
                               nazwisko,
                               adresZamieszkania,
                               email,
                               pesel,
-                              numerTelefonu,
-                              numerIndeksu);
+                              numerTelefonu);
+
+        int numerIndeksu = connect.save(student, NazwyTablic.STUDENCI.getNazwa());
+        this.student.setNumerIndeksu(numerIndeksu);
+
     }
 
     public void stworzWykladowce(String imie,
@@ -45,6 +51,9 @@ public class Dziekanat {
                 email,
                 pesel,
                 zarobki);
+
+        int id = connect.save(wykladowca, NazwyTablic.WYKLADOWCY.getNazwa());
+        this.wykladowca.setIdWykladowcy(id);
     }
 
     public void stworzKierunekStudiow(String nazwaKierunku,
@@ -58,17 +67,20 @@ public class Dziekanat {
     public void stworzRocznik(int numerRocznika){
 
         rocznik = new Rocznik(numerRocznika);
-
+        connect.save(rocznik, NazwyTablic.ROCZNIKI.getNazwa());
     }
 
     public void stworzPrzedmiot(String nazwaPrzedmiotu, Wykladowca wykladowca, RodzajePrzedmiotow rodzaj){
 
-        przedmiot = new Przedmiot(nazwaPrzedmiotu, wykladowca, rodzaj);
-
+        przedmiot = new Przedmiot(nazwaPrzedmiotu, wykladowca.getIdWykladowcy(), rodzaj);
+        int id = connect.save(przedmiot, NazwyTablic.PRZEDMIOTY.getNazwa());
+        przedmiot.setId(id);
     }
 
     public void dodajKierunekDoRocznika(){
-
+        rocznik.dodajKierunek(this.kierunekStudiow.getIdKierunku());
+        int id = connect.save(this.kierunekStudiow, "rocznik_"+ this.rocznik.getNumerRocznika());
+        this.kierunekStudiow.setIdKierunku(id);
     }
 
     public void getRocznik(int numerRocznika){
@@ -80,7 +92,7 @@ public class Dziekanat {
 
     public void dodajPrzedmiotDoKierunku(){
 
-        kierunekStudiow.dodajPrzedmiot(przedmiot);
+        kierunekStudiow.dodajPrzedmiot(przedmiot.getId());
     }
 
     public String wyswietlKierunkiNaRoczniku() throws Exception {
@@ -128,26 +140,64 @@ public class Dziekanat {
     }
 
     public void dodajOceneDoPrzedmiotu(double ocena){
-
+        przedmiot.dodajOcene(ocena);
     }
 
-    public void iloscWszystkichStudentow(){
+    public int iloscWszystkichStudentow(){
+       String[] studenci = connect.getColumn(NazwyTablic.STUDENCI.getNazwa(), "imie", "");
 
+       return studenci.length;
     }
 
-    public void iloscStudentowNaKierunku(){
-
+    public int iloscStudentowNaKierunku(){
+        return this.kierunekStudiow.getListaStudentow().size();
     }
 
-    public void iloscStudentowNaKierunkuIRoku(){
+    public int iloscStudentowNaKierunkuIRoku(){
+        int sumaStudentow = 0;
+        LocalDate data = LocalDate.now();
+        int rocznikPierwszy = data.getYear() - 1;
+        String[] nazwyKierunkow = connect.getColumn("rocznik_"+rocznikPierwszy,"nazwa_kierunku","");
+        for (String nazwaKierunku: nazwyKierunkow){
+            connect.laduj(this.kierunekStudiow, "rocznik_"+rocznikPierwszy, "WHERE nazwa_kierunku = '"+nazwaKierunku+"'");
+            sumaStudentow += this.kierunekStudiow.getListaStudentow().size();
+        }
 
+        return sumaStudentow;
     }
 
-    public void ktoMaNajlepszaOceneZPrzedmiotu(){
+    public int ktoMaNajlepszaOceneZPrzedmiotu(String nazwaPrzedmiotu){
+        Map<Integer,Float> srednie = new HashMap<>();
+        for (int student : this.kierunekStudiow.getListaOcen().keySet()){
+            srednie.put(student,this.jakaJestSredniaOcenaZPrzedmiotu(student,nazwaPrzedmiotu));
+        }
 
+        float najwyzszaOcena = 0;
+        int indeksStudenta = 0;
+
+        for(Map.Entry<Integer,Float> sredniaStudenta: srednie.entrySet()){
+           if(sredniaStudenta.getValue() > najwyzszaOcena)
+               indeksStudenta = sredniaStudenta.getKey();
+        }
+
+        return indeksStudenta;
     }
 
-    public void jakaJestSredniaOcenaZPrzedmiotu(){
+    public float jakaJestSredniaOcenaZPrzedmiotu(int numerIndeksu, String nazwaPrzedmiotu){
+        float srednia = 0;
+        for(Przedmiot przedmiot: this.kierunekStudiow.getListaOcen().get(numerIndeksu))
+            if(przedmiot.getNazwaPrzedmiotu().equals(nazwaPrzedmiotu)) {
+                this.przedmiot = przedmiot;
+                break;
+            }
 
+        for(double ocena: this.przedmiot.getOceny())
+            srednia += ocena;
+
+        srednia /= this.przedmiot.getOceny().size();
+
+        return srednia;
     }
+
+
 }
