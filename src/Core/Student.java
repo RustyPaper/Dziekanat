@@ -1,12 +1,11 @@
 package Core;
 
-import Core.DBConnect.Connect;
-import Core.Interface.ILoader;
+import Core.Interface.IConnect;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Student implements ILoader {
+public class Student implements IConnect {
 
     private String imie;
     private String nazwisko;
@@ -101,5 +100,21 @@ public class Student implements ILoader {
         this.setEmail(resultSet.getString(6));
         this.setNumerTelefonu(Integer.parseInt(resultSet.getString(7)));
         this.setNumerIndeksu(Integer.parseInt(resultSet.getString(8)));
+    }
+
+    @Override
+    public String save() {
+        StringBuilder queryWartosci = new StringBuilder();
+        queryWartosci.append("(");
+        queryWartosci.append("'"+this.getImie()+"',");
+        queryWartosci.append("'"+this.getNazwisko()+"',");
+        queryWartosci.append("'"+this.getAdresZamieszkania()+"',");
+        queryWartosci.append("'"+this.getPesel()+"',");
+        queryWartosci.append("'"+this.getEmail()+"',");
+        queryWartosci.append("'"+this.getNumerTelefonu()+"',");
+        queryWartosci.append("'"+this.getNumerIndeksu()+"',");
+        queryWartosci.append(")");
+
+        return queryWartosci.toString();
     }
 }

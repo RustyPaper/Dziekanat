@@ -1,7 +1,7 @@
 package Core.DBConnect;
 
 
-import Core.Interface.ILoader;
+import Core.Interface.IConnect;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -18,7 +18,6 @@ public class Connect {
     Properties props = new Properties();
     props.setProperty("user","tbswqeuckwbbbf");
     props.setProperty("password","0f7a37c062e7ff8a7b2ff730406dab2abf70cc29f293fb2a6aadd96330351f60");
-   // props.setProperty("ssl","true");
         try {
             conn = DriverManager.getConnection(url, props);
         } catch (SQLException e) {
@@ -40,7 +39,7 @@ public class Connect {
         }
     }
 
-    public void laduj(ILoader loaderInterface, String nazwaTablicy, String filtr){
+    public void laduj(IConnect loaderInterface, String nazwaTablicy, String filtr){
         this.loadFromDB(nazwaTablicy, null, filtr);
 
         try {
@@ -53,7 +52,7 @@ public class Connect {
 
     }
 
-    public void laduj(ILoader loaderInterface, int nazwaTablicy, String filtr){
+    public void laduj(IConnect loaderInterface, int nazwaTablicy, String filtr){
         this.laduj(loaderInterface,"rocznik_"+String.valueOf(nazwaTablicy), filtr);
     }
 
@@ -74,5 +73,16 @@ public class Connect {
         String[] wynikArr = new String[wynik.size()];
         wynik.toArray(wynikArr);
         return wynikArr;
+    }
+
+    public void save(IConnect inst, String nazwaTab){
+        String query = "INSERT INTO "+nazwaTab+" "+inst.save();
+        try {
+            this.st = conn.prepareStatement(query);
+            this.st.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

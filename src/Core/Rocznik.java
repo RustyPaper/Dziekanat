@@ -1,13 +1,13 @@
 package Core;
 
-import Core.Interface.ILoader;
+import Core.Interface.IConnect;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Rocznik implements ILoader {
+public class Rocznik implements IConnect {
 
     private int numerRocznika;
     private List<Integer> listaKierunkow;
@@ -48,5 +48,18 @@ public class Rocznik implements ILoader {
         for (String id: idKierunkow){
             this.listaKierunkow.add(Integer.parseInt(id));
         }
+    }
+
+    @Override
+    public String save() {
+        StringBuilder queryWartosci = new StringBuilder();
+        queryWartosci.append("(");
+        queryWartosci.append("'"+this.getNumerRocznika()+"',");
+        for (int indeks: getListaKierunkow()){
+            queryWartosci.append("'"+indeks+"',");
+        }
+        queryWartosci.append(")");
+
+        return queryWartosci.toString();
     }
 }

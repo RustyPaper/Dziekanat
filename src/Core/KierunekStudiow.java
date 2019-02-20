@@ -1,18 +1,14 @@
 package Core;
 
-import Core.DBConnect.Connect;
-import Core.DBConnect.NazwyTablic;
 import Core.Interface.IListaStudentow;
-import Core.Interface.ILoader;
+import Core.Interface.IConnect;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class KierunekStudiow implements IListaStudentow, ILoader {
+public class KierunekStudiow implements IListaStudentow, IConnect {
 
     private String nazwaKierunku;
     private int progWejsciowy;
@@ -97,6 +93,20 @@ public class KierunekStudiow implements IListaStudentow, ILoader {
         for (String indeks: indeksyStudentow){
             this.listaStudentow.add(Integer.parseInt(indeks));
         }
+    }
+
+    @Override
+    public String save() {
+        StringBuilder queryWartosci = new StringBuilder();
+        queryWartosci.append("(");
+        queryWartosci.append("'"+this.getNazwaKierunku()+"',");
+        queryWartosci.append("'"+this.getProgWejsciowy()+"',");
+        for (int indeks: getListaStudentow()){
+            queryWartosci.append("'"+indeks+"',");
+        }
+        queryWartosci.append(")");
+
+        return queryWartosci.toString();
     }
 }
 

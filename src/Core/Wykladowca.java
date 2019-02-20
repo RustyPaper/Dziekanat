@@ -1,6 +1,11 @@
 package Core;
 
-public class Wykladowca {
+import Core.Interface.IConnect;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class Wykladowca implements IConnect {
         private String imie;
         private String nazwisko;
         private String adresZamieszkania;
@@ -68,5 +73,30 @@ public class Wykladowca {
 
     public void setZarobki(float zarobki) {
         this.zarobki = zarobki;
+    }
+
+    @Override
+    public void load(ResultSet resultSet) throws SQLException {
+        this.setImie(resultSet.getString(1));
+        this.setNazwisko(resultSet.getString(2));
+        this.setAdresZamieszkania(resultSet.getString(3));
+        this.setEmail(resultSet.getString(4));
+        this.setPesel(Long.parseLong(resultSet.getString(5)));
+        this.setZarobki(Float.parseFloat(resultSet.getString(6)));
+    }
+
+    @Override
+    public String save() {
+        StringBuilder queryWartosci = new StringBuilder();
+        queryWartosci.append("(");
+        queryWartosci.append("'"+this.getImie()+"',");
+        queryWartosci.append("'"+this.getNazwisko()+"',");
+        queryWartosci.append("'"+this.getAdresZamieszkania()+"',");
+        queryWartosci.append("'"+this.getEmail()+"',");
+        queryWartosci.append("'"+this.getPesel()+"',");
+        queryWartosci.append("'"+this.getZarobki()+"',");
+        queryWartosci.append(")");
+
+        return queryWartosci.toString();
     }
 }

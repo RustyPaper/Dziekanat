@@ -1,18 +1,22 @@
 package Core;
 
+import Core.Interface.IConnect;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Przedmiot {
+public class Przedmiot implements IConnect {
 
     private String nazwaPrzedmiotu;
-    private Wykladowca wykladowca;
+    private int wykladowca;
     private RodzajePrzedmiotow rodzaj;
     private Map<Integer, List<Double>> ocenyCzastkowe;
 
-    public Przedmiot(String nazwaPrzedmiotu, Wykladowca wykladowca, RodzajePrzedmiotow rodzaj) {
+    public Przedmiot(String nazwaPrzedmiotu, int wykladowca, RodzajePrzedmiotow rodzaj) {
         this.nazwaPrzedmiotu = nazwaPrzedmiotu;
         this.wykladowca = wykladowca;
         this.rodzaj = rodzaj;
@@ -28,11 +32,11 @@ public class Przedmiot {
         this.nazwaPrzedmiotu = nazwaPrzedmiotu;
     }
 
-    public Wykladowca getWykladowca() {
+    public int getWykladowca() {
         return wykladowca;
     }
 
-    public void setWykladowca(Wykladowca wykladowca) {
+    public void setWykladowca(int wykladowca) {
         this.wykladowca = wykladowca;
     }
 
@@ -69,5 +73,24 @@ public class Przedmiot {
         }
 
         return ocenyCzastkowe.get(numerIndeksu);
+    }
+
+    @Override
+    public void load(ResultSet resultSet) throws SQLException {
+        this.setNazwaPrzedmiotu(resultSet.getString(2));
+        this.setRodzaj(RodzajePrzedmiotow.valueOf(resultSet.getString(3)));
+        this.setWykladowca(Integer.parseInt(resultSet.getString(4)));
+    }
+
+    @Override
+    public String save() {
+        StringBuilder queryWartosci = new StringBuilder();
+        queryWartosci.append("(");
+        queryWartosci.append("'"+this.getNazwaPrzedmiotu()+"',");
+        queryWartosci.append("'"+this.getRodzaj()+"',");
+        queryWartosci.append("'"+this.getWykladowca()+"',");
+        queryWartosci.append(")");
+
+        return queryWartosci.toString();
     }
 }
