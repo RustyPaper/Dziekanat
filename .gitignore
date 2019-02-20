@@ -1,3 +1,4 @@
 .idea/vcs.xml
 out/
-.idea/workspace.xml
+DatabaseGenerator/configDB.json
+.DS_Store
