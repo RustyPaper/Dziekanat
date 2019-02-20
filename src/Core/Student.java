@@ -1,6 +1,12 @@
 package Core;
 
-public class Student {
+import Core.DBConnect.Connect;
+import Core.Interface.ILoader;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class Student implements ILoader {
 
     private String imie;
     private String nazwisko;
@@ -9,6 +15,10 @@ public class Student {
     private long pesel;
     private int numerTelefonu;
     private int numerIndeksu;
+
+    public  Student(){
+
+    }
 
     public Student(String imie,
                    String nazwisko,
@@ -80,5 +90,16 @@ public class Student {
 
     public void setNumerIndeksu(int numerIndeksu) {
         this.numerIndeksu = numerIndeksu;
+    }
+
+    @Override
+    public void load(ResultSet resultSet) throws SQLException {
+        this.setImie(resultSet.getString(2));
+        this.setNazwisko(resultSet.getString(3));
+        this.setAdresZamieszkania(resultSet.getString(4));
+        this.setPesel(Long.parseLong(resultSet.getString(5)));
+        this.setEmail(resultSet.getString(6));
+        this.setNumerTelefonu(Integer.parseInt(resultSet.getString(7)));
+        this.setNumerIndeksu(Integer.parseInt(resultSet.getString(8)));
     }
 }

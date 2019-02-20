@@ -1,4 +1,7 @@
 package Core;
 
-public class RodzajePrzedmiotow {
+public enum RodzajePrzedmiotow {
+    WYKLAD,
+    LABORATORIUM,
+    CWICZENIA
 }

@@ -1,28 +1,58 @@
 package Core;
 
+import Core.DBConnect.Connect;
+import Core.DBConnect.NazwyTablic;
+import Core.Interface.IListaStudentow;
+import Core.Interface.ILoader;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class KierunekStudiow {
+public class KierunekStudiow implements IListaStudentow, ILoader {
 
     private String nazwaKierunku;
     private int progWejsciowy;
-    private Map<Integer, Student> listaStudentow;
-    private ArrayList<String> listaPrzedmiotow;
-    private Map<Integer, Map<String, Double>> listaOcen;
-    private Map<Long, Wykladowca> listaWykladowcow;
+    private List<Integer> listaStudentow;
+    private ArrayList<Przedmiot> listaPrzedmiotow;
+    private TypStudiow typStudiow;
+
+    public KierunekStudiow(){
+
+        this.listaStudentow = new ArrayList<>();
+        this.listaPrzedmiotow = new ArrayList<>();
+
+    }
 
     public KierunekStudiow(String nazwaKierunku,
                            int progWejsciowy,
-                           Map<Integer, Student> listaStudentow,
-                           ArrayList<String> listaPrzedmiotow,
-                           Map<Long, Wykladowca> listaWykladowcow,
-                           Map<Integer, Map<String, Double>> listaOcen) {
+                           TypStudiow typStudiow) {
         this.nazwaKierunku = nazwaKierunku;
         this.progWejsciowy = progWejsciowy;
-        this.listaStudentow = listaStudentow;
-        this.listaPrzedmiotow = listaPrzedmiotow;
-        this.listaWykladowcow = listaWykladowcow;
+        this.listaStudentow = new ArrayList<>();
+        this.listaPrzedmiotow = new ArrayList<>();
+        this.typStudiow = typStudiow;
+    }
+
+    public void dodajPrzedmiot(Przedmiot przedmiot) {
+
+        this.listaPrzedmiotow.add(przedmiot);
+
+    }
+
+    public List<Przedmiot> wyszukajPrzedmiot(String nazwa){
+
+        ArrayList<Przedmiot> wynikWyszukiwania = new ArrayList<>();
+        for (Przedmiot przedmiot: this.listaPrzedmiotow){
+            if (przedmiot.getNazwaPrzedmiotu() == nazwa){
+                wynikWyszukiwania.add(przedmiot);
+            }
+        }
+
+        return wynikWyszukiwania;
     }
 
     public String getNazwaKierunku() {
@@ -41,36 +71,32 @@ public class KierunekStudiow {
         this.progWejsciowy = progWejsciowy;
     }
 
-    public Map<Integer, Student> getListaStudentow() {
-        return listaStudentow;
-    }
-
-    public void setListaStudentow(Map<Integer, Student> listaStudentow) {
-        this.listaStudentow = listaStudentow;
-    }
-
-    public ArrayList<String> getListaPrzedmiotow() {
+    public ArrayList<Przedmiot> getListaPrzedmiotow() {
         return listaPrzedmiotow;
     }
 
-    public void setListaPrzedmiotow(ArrayList<String> listaPrzedmiotow) {
-        this.listaPrzedmiotow = listaPrzedmiotow;
+    public TypStudiow getTypStudiow() {
+        return typStudiow;
     }
 
-    public Map<Long, Wykladowca> getListaWykladowcow() {
-        return listaWykladowcow;
+    public void setTypStudiow(TypStudiow typStudiow) {
+        this.typStudiow = typStudiow;
     }
 
-    public void setListaWykladowcow(Map<Long, Wykladowca> listaWykladowcow) {
-        this.listaWykladowcow = listaWykladowcow;
+    @Override
+    public List<Integer> getListaStudentow() {
+        return listaStudentow;
     }
 
-    public Map<Integer, Map<String, Double>> getListaOcen() {
-        return listaOcen;
-    }
 
-    public void setListaOcen(Map<Integer, Map<String, Double>> listaOcen) {
-        this.listaOcen = listaOcen;
+    @Override
+    public void load(ResultSet resultSet) throws SQLException {
+        this.setNazwaKierunku(resultSet.getString(2));
+        this.setProgWejsciowy(resultSet.getInt(3));
+        String[] indeksyStudentow = resultSet.getString(4).split(";");
+        for (String indeks: indeksyStudentow){
+            this.listaStudentow.add(Integer.parseInt(indeks));
+        }
     }
 }
 
