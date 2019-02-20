@@ -86,15 +86,9 @@ public class Dziekanat {
     public String wyswietlKierunkiNaRoczniku() throws Exception {
 
        if (this.rocznik == null) throw new Exception("Nie zaladowano rocznika!\n");
-        StringBuilder stringBuilder = new StringBuilder();
 
-       for (Integer idKierunku: this.rocznik.getListaKierunkow()){
-           this.kierunekStudiow = new KierunekStudiow();
-           connect.laduj(this.kierunekStudiow, this.rocznik.getNumerRocznika(), "WHERE id = "+idKierunku);
-           stringBuilder.append(this.kierunekStudiow.getNazwaKierunku()).append("\n");
-       }
-
-       return stringBuilder.toString();
+       String[] nazwyKierunkow = connect.getColumn("rocznik_"+this.rocznik.getNumerRocznika(),"nazwa_kierunku","");
+       return String.join("\n",nazwyKierunkow);
 
     }
 
