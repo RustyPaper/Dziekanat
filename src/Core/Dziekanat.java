@@ -199,5 +199,16 @@ public class Dziekanat {
         return srednia;
     }
 
+    public String znajdzUczniaPoIndeksie(int numerIndeksu){
+        connect.laduj(this.student, NazwyTablic.STUDENCI.getNazwa(), "WHERE id = "+numerIndeksu);
+
+        return this.wyswietlStudenta();
+    }
+
+    public String wyswietlRoczniki(){
+        String[] roczniki = connect.getColumn(NazwyTablic.ROCZNIKI.getNazwa(),"numer_rocznika", "");
+        return String.join("\n", roczniki);
+    }
+
 
 }

@@ -104,9 +104,10 @@ public class KierunekStudiow implements IListaStudentow, IConnect {
         this.setProgWejsciowy(resultSet.getInt(3));
 
         String[] idPrzedmiotow = resultSet.getString(5).split(";");
-        for(String idPrzedmiotu: idPrzedmiotow)
-            this.listaPrzedmiotow.add(Integer.parseInt(idPrzedmiotu));
-
+        if(idPrzedmiotow.length > 0) {
+            for (String idPrzedmiotu : idPrzedmiotow)
+                this.listaPrzedmiotow.add(Integer.parseInt(idPrzedmiotu));
+        }
         String[] indeksyStudentow = resultSet.getString(4).split(";");
         Przedmiot przedmiot;
         for (String indeks: indeksyStudentow){
