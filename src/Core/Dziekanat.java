@@ -91,9 +91,9 @@ public class Dziekanat {
 
     }
 
-    public void dodajPrzedmiotDoKierunku(){
+    public void dodajPrzedmiotDoKierunku(int id){
 
-        kierunekStudiow.dodajPrzedmiot(przedmiot.getId());
+        kierunekStudiow.dodajPrzedmiot(id);
     }
 
     public String wyswietlKierunkiNaRoczniku() throws Exception {
@@ -144,11 +144,23 @@ public class Dziekanat {
         return wynik.toString();
     }
 
-    public void dodajOceneDoPrzedmiotu(double ocena){
-        przedmiot.dodajOcene(ocena);
+    public void dodajOceneDoPrzedmiotu(int numerIndeksu, String nazwaPrzedmiotu ,double ocena){
+        for(Przedmiot przedmiotStudenta: this.kierunekStudiow.getListaOcen().get(numerIndeksu)){
+            if(przedmiotStudenta.getNazwaPrzedmiotu().equals(nazwaPrzedmiotu))
+                przedmiotStudenta.dodajOcene(ocena);
+        }
     }
 
-    //public void wyswietl
+    public String wyswietlWszystkiePrzedmioty(){
+         String[][] przedmioty = connect.getColumn(NazwyTablic.PRZEDMIOTY.getNazwa(),new String[]{"id","nazwa_przedmiotu","rodzaj"},"");
+         StringBuilder wynik = new StringBuilder();
+
+         for(String[] przedmiotZBazy: przedmioty){
+             wynik.append(przedmiotZBazy[0]).append(". ").append(przedmiotZBazy[1]).append(" ").append(przedmiotZBazy[2]).append("\n");
+         }
+
+         return wynik.toString();
+    }
 
     public int iloscWszystkichStudentow(){
        String[][] studenci = connect.getColumn(NazwyTablic.STUDENCI.getNazwa(), new String[]{"imie"}, "");
@@ -263,5 +275,22 @@ public class Dziekanat {
         return wynik.toString();
     }
 
+    public void dodajStudentaDoKierunku(int numerIndeksu){
+        this.kierunekStudiow.getListaStudentow().add(numerIndeksu);
+    }
+
+    public String wyswietlWszystkichStudentow(){
+        StringBuilder studenci = new StringBuilder();
+
+        String[][] studenciZBazy = connect.getColumn(NazwyTablic.STUDENCI.getNazwa(),new String[]{"id","imie","nazwisko"},"");
+
+        for(String[] identyfikatorWykladowcy: studenciZBazy )
+            studenci.append(identyfikatorWykladowcy[0])
+                    .append(". ").append(identyfikatorWykladowcy[1])
+                    .append(" ").append(identyfikatorWykladowcy[2])
+                    .append("\n");
+
+        return studenci.toString();
+    }
 
 }

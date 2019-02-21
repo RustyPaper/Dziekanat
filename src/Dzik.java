@@ -12,7 +12,8 @@ public class Dzik {
     private final opcjaMenu[] opcjeGlownegoMenu = {
             new opcjaMenu(1,"wczytaj", ()->this.wyswietlMenu(this.opcjeSubMenuWczytaj)),
             new opcjaMenu(2, "zapisz", ()->this.wyswietlMenu(this.opcjeSubMenuZapisz)),
-            new opcjaMenu(3, "wyszukaj", ()->this.wyswietlMenu(this.opcjeSubMenuWyszukaj)),
+            new opcjaMenu(3, "wyswietl", ()->this.wyswietlMenu(this.opcjeSubMenuWyswietl)),
+            new opcjaMenu(4, "wyszukaj", ()->this.wyswietlMenu(this.opcjeSubMenuWyszukaj)),
             new opcjaMenu(4, "Zakoncz", null)
     };
 
@@ -22,28 +23,31 @@ public class Dzik {
             new opcjaMenu(3,"średnia ocena ucznia z przedmiotu", this::wyswietlSredniaOceneZPrzedmiotu),
             new opcjaMenu(4,"wyswietl wykladowce", this::wyswietlWykladowce),
             new opcjaMenu(5,"wyswietl wykladowcow", this::wyswietlWykladowcow),
-            new opcjaMenu(6,"wyswietl oceny studenta", this::wyswietlOcenyStudenta),
-            new opcjaMenu(6,"ilosc wszystkich studentow",this::wyswietlIloscWszystkichStudentow),
-            new opcjaMenu(7,"ilosc studentow na kierunku", this::wyswietlIloscStudentowNaKierunku),
-            new opcjaMenu(8,"ilosc studentow na I roku", this::iloscStudentowNaKierunkuIRoku),
-            new opcjaMenu(9, "powrot", this::glowneMenu)
+            new opcjaMenu(6,"wyswietl wszystkich studentow", this::wyswietlWszystkichStudentow),
+            new opcjaMenu(7,"wyswietl wszystkie przedmioty", this::wyswietlWszystkiePrzedmioty),
+            new opcjaMenu(8,"wyswietl oceny studenta", this::wyswietlOcenyStudenta),
+            new opcjaMenu(9,"ilosc wszystkich studentow",this::wyswietlIloscWszystkichStudentow),
+            new opcjaMenu(10,"ilosc studentow na kierunku", this::wyswietlIloscStudentowNaKierunku),
+            new opcjaMenu(11,"ilosc studentow na I roku", this::iloscStudentowNaKierunkuIRoku),
+            new opcjaMenu(12, "powrot", this::glowneMenu)
     };
 
     private final opcjaMenu[] opcjeSubMenuWczytaj = {
             new opcjaMenu(1, "wczytaj rocznik", this::wczytajRocznik),
             new opcjaMenu(2, "wczytaj kierunek", this::wczytajKierunek),
-            new opcjaMenu(5, "powrot", this::glowneMenu)
+            new opcjaMenu(3, "powrot", this::glowneMenu)
     };
 
     private final opcjaMenu[] opcjeSubMenuZapisz = {
             new opcjaMenu(1, "zapisz rocznik", this::zapiszRocznik),
             new opcjaMenu(2, "zapisz kierunek", this::zapiszKierunek),
             new opcjaMenu(3, "zapisz przedmiot", this::zapiszPrzedmiot),
-            new opcjaMenu(4, "dodaj przedmioty do kierunku", null),
-            new opcjaMenu(5, "zapisz studenta do kierunku", null),
-            new opcjaMenu(5, "zapisz Wykladowce", this::stworzWykladowce),
-            new opcjaMenu(6, "dodaj studenta", this::dodajStudenta),
-            new opcjaMenu(7, "powrot", this::glowneMenu)
+            new opcjaMenu(4, "dodaj przedmioty do kierunku", this::dodajPrzedmiotDoKierunku),
+            new opcjaMenu(5, "dodaj ocene z orzedmiotu dla studenta", this::dodajOceneStudentowi),
+            new opcjaMenu(6, "zapisz studenta do kierunku", this::dodajStudentaDoKierunku),
+            new opcjaMenu(7, "zapisz Wykladowce", this::stworzWykladowce),
+            new opcjaMenu(8, "dodaj studenta", this::dodajStudenta),
+            new opcjaMenu(9, "powrot", this::glowneMenu)
     };
 
     private final opcjaMenu[] opcjeSubMenuWyszukaj = {
@@ -182,8 +186,15 @@ public class Dzik {
     }
 
     private void dodajPrzedmiotDoKierunku(){
-        //TODO Dokonczyc
-        dziekanat.dodajPrzedmiotDoKierunku();
+
+        this.wyswietlWszystkiePrzedmioty();
+
+        System.out.println("Podaj id przedmiotu: ");
+        int id = this.czytnik.nextInt();
+
+        dziekanat.dodajPrzedmiotDoKierunku(id);
+
+        this.wyswietlMenu(this.opcjeSubMenuZapisz);
     }
 
     private void zapiszPrzedmiot(){
@@ -192,7 +203,8 @@ public class Dzik {
         System.out.print("\nWpisz nazwe przedmiotu: ");
         String nazwa = this.czytnik.nextLine();
 
-        this.wyswietlWykladowcow();
+       String wykladowcy = this.dziekanat.wyswietlWykladowcow();
+       System.out.println(wykladowcy);
 
         System.out.print("Wpisz id wykladowcy: ");
         int idWykladowcy = this.czytnik.nextInt();
@@ -206,6 +218,7 @@ public class Dzik {
         String rodzajPrzedmiotu = this.czytnik.nextLine();
 
         dziekanat.stworzPrzedmiot(nazwa,idWykladowcy, RodzajePrzedmiotow.valueOf(rodzajPrzedmiotu));
+        this.wyswietlMenu(this.opcjeSubMenuZapisz);
     }
 
     private void stworzWykladowce(){
@@ -331,12 +344,52 @@ public class Dzik {
         wyswietlMenu(this.opcjeSubMenuWyswietl);
     }
 
-    public void iloscStudentowNaKierunkuIRoku(){
+    private void iloscStudentowNaKierunkuIRoku(){
         int ilosc =(this.dziekanat.iloscStudentowNaKierunkuIRoku());
 
         System.out.println("Ilosc wszystkich studentow na I roku wynosi: "+ilosc);
 
         wyswietlMenu(this.opcjeSubMenuWyswietl);
+    }
+
+    private void wyswietlWszystkiePrzedmioty(){
+        String przedmioty = this.dziekanat.wyswietlWszystkiePrzedmioty();
+
+        System.out.println(przedmioty);
+
+        wyswietlMenu(this.opcjeSubMenuWyswietl);
+    }
+
+    private void dodajOceneStudentowi(){
+        System.out.print("Podaj numer indeksu studenta: ");
+        int numerIndeksu = this.czytnik.nextInt();
+
+        this.czytnik.nextLine();
+        System.out.print("Podaj nazwe przedmiotu: ");
+        String nazwaPrzedmiotu = this.czytnik.nextLine();
+
+        System.out.print("Podaj ocene: ");
+        double ocena = this.czytnik.nextDouble();
+
+        this.dziekanat.dodajOceneDoPrzedmiotu(numerIndeksu, nazwaPrzedmiotu, ocena);
+        this.wyswietlMenu(this.opcjeSubMenuZapisz);
+    }
+
+    private void dodajStudentaDoKierunku() {
+        String studenci = this.dziekanat.wyswietlWszystkichStudentow();
+        System.out.println(studenci);
+
+        System.out.print("\nPodaj numer indeksu studenta: ");
+        int indeks = this.czytnik.nextInt();
+        this.dziekanat.dodajStudentaDoKierunku(indeks);
+
+        this.wyswietlMenu(this.opcjeSubMenuZapisz);
+    }
+
+    private void wyswietlWszystkichStudentow(){
+        String studenci = this.dziekanat.wyswietlWszystkichStudentow();
+        System.out.println(studenci);
+        this.wyswietlMenu(this.opcjeSubMenuWyswietl);
     }
 }
 

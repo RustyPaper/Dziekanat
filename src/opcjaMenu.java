@@ -19,6 +19,7 @@ public class opcjaMenu {
     }
 
     public void uruchomSubMenu(){
-        listener.run();
+        if(listener != null)
+            listener.run();
     }
 }
