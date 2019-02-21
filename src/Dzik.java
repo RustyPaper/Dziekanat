@@ -1,5 +1,7 @@
 
 import Core.Dziekanat;
+import Core.RodzajePrzedmiotow;
+import Core.TypStudiow;
 
 import java.util.Scanner;
 
@@ -14,29 +16,39 @@ public class Dzik {
             new opcjaMenu(4, "Zakoncz", null)
     };
 
+    private final opcjaMenu[] opcjeSubMenuWyswietl = {
+            new opcjaMenu(1,"wyswietl studenta", this::wyswietlStudenta),
+            new opcjaMenu(2, "wyswietl kierunek", this::wyswietlKierunek),
+            new opcjaMenu(3,"średnia ocena ucznia z przedmiotu", this::wyswietlSredniaOceneZPrzedmiotu),
+            new opcjaMenu(4,"wyswietl wykladowce", this::wyswietlWykladowce),
+            new opcjaMenu(5,"wyswietl wykladowcow", this::wyswietlWykladowcow),
+            new opcjaMenu(6,"wyswietl oceny studenta", this::wyswietlOcenyStudenta),
+            new opcjaMenu(6,"ilosc wszystkich studentow",this::wyswietlIloscWszystkichStudentow),
+            new opcjaMenu(7,"ilosc studentow na kierunku", this::wyswietlIloscStudentowNaKierunku),
+            new opcjaMenu(8,"ilosc studentow na I roku", this::iloscStudentowNaKierunkuIRoku),
+            new opcjaMenu(9, "powrot", this::glowneMenu)
+    };
 
     private final opcjaMenu[] opcjeSubMenuWczytaj = {
             new opcjaMenu(1, "wczytaj rocznik", this::wczytajRocznik),
             new opcjaMenu(2, "wczytaj kierunek", this::wczytajKierunek),
-            new opcjaMenu(3, "wyswietl kierunek", this::wyswietlKierunek),
-            new opcjaMenu(4,"wyswietl studenta", null),
-            new opcjaMenu(5,"wyswietl wykladowce", null),
-            new opcjaMenu(6,"wyswietl oceny studenta z przedmiotu", null),
-            new opcjaMenu(7,"średnia ocena ucznia z przedmiotu", null),
-            new opcjaMenu(8, "powrot", this::glowneMenu)
+            new opcjaMenu(5, "powrot", this::glowneMenu)
     };
 
     private final opcjaMenu[] opcjeSubMenuZapisz = {
-            new opcjaMenu(1, "zapisz rocznik", null),
-            new opcjaMenu(2, "zapisz kierunek", null),
-            new opcjaMenu(3, "zapisz studenta do kierunku", null),
-            new opcjaMenu(4, "dodaj studenta", null),
-            new opcjaMenu(5, "powrot", this::glowneMenu)
+            new opcjaMenu(1, "zapisz rocznik", this::zapiszRocznik),
+            new opcjaMenu(2, "zapisz kierunek", this::zapiszKierunek),
+            new opcjaMenu(3, "zapisz przedmiot", this::zapiszPrzedmiot),
+            new opcjaMenu(4, "dodaj przedmioty do kierunku", null),
+            new opcjaMenu(5, "zapisz studenta do kierunku", null),
+            new opcjaMenu(5, "zapisz Wykladowce", this::stworzWykladowce),
+            new opcjaMenu(6, "dodaj studenta", this::dodajStudenta),
+            new opcjaMenu(7, "powrot", this::glowneMenu)
     };
 
     private final opcjaMenu[] opcjeSubMenuWyszukaj = {
             new opcjaMenu(1, "Kto ma najlepsza ocene z przedmiotu", this::ktoMaNajlepszaOcene),
-            new opcjaMenu(5, "powrot", this::glowneMenu)
+            new opcjaMenu(2, "powrot", this::glowneMenu)
     };
 
     private Scanner czytnik;
@@ -75,7 +87,7 @@ public class Dzik {
 
    private opcjaMenu wyswietlMenu(opcjaMenu[] opcje){
        wyczyscKonsole();
-
+       System.out.println("\n");
        for(opcjaMenu opcja: opcje)
            System.out.println("\t\t"+opcja.getNumer()+". "+opcja.getNazwa());
 
@@ -112,7 +124,8 @@ public class Dzik {
             System.out.println("Wczytano");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println(e.toString());
         }
         wyswietlMenu(this.opcjeSubMenuWczytaj);
     }
@@ -123,7 +136,8 @@ public class Dzik {
             System.out.println(kierunek);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println(e.toString());
         }
         wyswietlMenu(this.opcjeSubMenuWczytaj);
     }
@@ -137,4 +151,192 @@ public class Dzik {
         System.out.print("\nNajlepszym uczniem na tym kierunku z przedmiotu "+przedmiot+" jest \n"+uczen);
         wyswietlMenu(this.opcjeSubMenuWyszukaj);
     }
+
+    private void zapiszKierunek(){
+        this.czytnik.nextLine();
+        System.out.println("\nPodaj nazwe kierunku: ");
+        String nazwaKierunku = this.czytnik.nextLine();
+
+        System.out.println("\nPodaj prog wejsciowy: ");
+        int progWejsciowy = this.czytnik.nextInt();
+
+        this.czytnik.nextLine();
+        wybierzTypStudiow();
+        System.out.print("\nWpisz Typ Studiow");
+        String typStudiow = this.czytnik.nextLine();
+
+        dziekanat.stworzKierunekStudiow(nazwaKierunku,progWejsciowy,TypStudiow.valueOf(typStudiow));
+
+
+
+        dziekanat.dodajKierunekDoRocznika();
+        wyswietlMenu(this.opcjeSubMenuZapisz);
+    }
+
+    private void zapiszRocznik(){
+        System.out.print("Podaj numer rocznika: ");
+        int numerRocznika = czytnik.nextInt();
+
+        dziekanat.stworzRocznik(numerRocznika);
+        wyswietlMenu(this.opcjeSubMenuZapisz);
+    }
+
+    private void dodajPrzedmiotDoKierunku(){
+        //TODO Dokonczyc
+        dziekanat.dodajPrzedmiotDoKierunku();
+    }
+
+    private void zapiszPrzedmiot(){
+        this.czytnik.nextLine();
+
+        System.out.print("\nWpisz nazwe przedmiotu: ");
+        String nazwa = this.czytnik.nextLine();
+
+        this.wyswietlWykladowcow();
+
+        System.out.print("Wpisz id wykladowcy: ");
+        int idWykladowcy = this.czytnik.nextInt();
+
+        System.out.println("Rodzaje przedmiotu: ");
+        for(RodzajePrzedmiotow rodzaj: RodzajePrzedmiotow.values())
+            System.out.println(rodzaj);
+
+        this.czytnik.nextLine();
+        System.out.print("Wpisz id wykladowcy: ");
+        String rodzajPrzedmiotu = this.czytnik.nextLine();
+
+        dziekanat.stworzPrzedmiot(nazwa,idWykladowcy, RodzajePrzedmiotow.valueOf(rodzajPrzedmiotu));
+    }
+
+    private void stworzWykladowce(){
+        czytnik.nextLine();
+
+        System.out.print("\nWpisz imie: ");
+        String imieWykladowcy = this.czytnik.nextLine();
+
+        System.out.print("\nWpisz nazwisko: ");
+        String nazwiskoWykladowcy = this.czytnik.nextLine();
+
+        System.out.print("\nWpisz adres zamieszkania: ");
+        String adresZamieszkania = this.czytnik.nextLine();
+
+        System.out.print("\nWpisz email: ");
+        String emailWykladowcy = this.czytnik.nextLine();
+
+        System.out.print("\nWpisz pesel: ");
+        long peselWykladowcy = this.czytnik.nextLong();
+
+
+        System.out.print("\nWpisz zarobki: ");
+        float zarobkiWykladowcy = this.czytnik.nextFloat();
+
+        dziekanat.stworzWykladowce(imieWykladowcy, nazwiskoWykladowcy,adresZamieszkania,emailWykladowcy, peselWykladowcy, zarobkiWykladowcy);
+        wyswietlMenu(this.opcjeSubMenuZapisz);
+    }
+
+    private void wybierzTypStudiow(){
+        System.out.println("Typ studiow: ");
+        for(TypStudiow typ : TypStudiow.values())
+            System.out.println(typ);
+    }
+
+    private void wyswietlOcenyStudenta(){
+        //this.czytnik.nextLine();
+
+        System.out.print("Podaj numer indeksu studenta: ");
+        int numerIndeksu =czytnik.nextInt();
+        String oceny = dziekanat.wyswietlOceny(numerIndeksu);
+
+        System.out.println(oceny);
+        wyswietlMenu(this.opcjeSubMenuWyswietl);
+    }
+
+    private void wyswietlWykladowcow(){
+        String wykladowcy = dziekanat.wyswietlWykladowcow();
+
+        System.out.println(wykladowcy);
+        wyswietlMenu(this.opcjeSubMenuWyswietl);
+    }
+
+    private void wyswietlWykladowce(){
+        System.out.print("\nPodaj id wykladowcy: ");
+        int id = czytnik.nextInt();
+
+       String wykladowca =  dziekanat.wyswietlWykladowce(id);
+       System.out.println(wykladowca);
+       wyswietlMenu(this.opcjeSubMenuWyswietl);
+    }
+
+    private void wyswietlStudenta(){
+        System.out.print("\nPodaj id wykladowcy: ");
+        int id = czytnik.nextInt();
+
+        String student =  dziekanat.znajdzUczniaPoIndeksie(id);
+        System.out.println(student);
+        wyswietlMenu(this.opcjeSubMenuWyswietl);
+    }
+
+    private void wyswietlSredniaOceneZPrzedmiotu(){
+        System.out.print("\nPodaj numer indeksu studenta: ");
+        int numerIndeksu = czytnik.nextInt();
+
+        czytnik.nextLine();
+        System.out.print("\nPodaj nazwe przedmiotu: ");
+        String nazwaPrzedmiotu = czytnik.nextLine();
+        float srednia = dziekanat.jakaJestSredniaOcenaZPrzedmiotu(numerIndeksu, nazwaPrzedmiotu);
+
+        System.out.println("\nSrednia ocena z "+nazwaPrzedmiotu+" to: "+srednia);
+        wyswietlMenu(this.opcjeSubMenuWyswietl);
+    }
+
+    private void dodajStudenta(){
+        this.czytnik.nextLine();
+
+        System.out.print("\nWpisz imie: ");
+        String imieWykladowcy = this.czytnik.nextLine();
+
+        System.out.print("\nWpisz nazwisko: ");
+        String nazwiskoWykladowcy = this.czytnik.nextLine();
+
+        System.out.print("\nWpisz adres zamieszkania: ");
+        String adresZamieszkania = this.czytnik.nextLine();
+
+        System.out.print("\nWpisz email: ");
+        String emailWykladowcy = this.czytnik.nextLine();
+
+        System.out.print("\nWpisz pesel: ");
+        long peselWykladowcy = this.czytnik.nextLong();
+
+
+        System.out.print("\nWpisz numer telefonu: ");
+        int numerTelefonu = this.czytnik.nextInt();
+
+        dziekanat.stworzStudenta(imieWykladowcy, nazwiskoWykladowcy,adresZamieszkania,emailWykladowcy, peselWykladowcy, numerTelefonu);
+        wyswietlMenu(this.opcjeSubMenuZapisz);
+    }
+
+    private void wyswietlIloscWszystkichStudentow(){
+        int ilosc =(this.dziekanat.iloscWszystkichStudentow());
+
+        System.out.println("Ilosc wszystkich studentow wynosi: "+ilosc);
+
+        wyswietlMenu(this.opcjeSubMenuWyswietl);
+    }
+
+    private void wyswietlIloscStudentowNaKierunku(){
+        int ilosc =(this.dziekanat.iloscStudentowNaKierunku());
+
+        System.out.println("Ilosc wszystkich studentow na kierunku wynosi: "+ilosc);
+
+        wyswietlMenu(this.opcjeSubMenuWyswietl);
+    }
+
+    public void iloscStudentowNaKierunkuIRoku(){
+        int ilosc =(this.dziekanat.iloscStudentowNaKierunkuIRoku());
+
+        System.out.println("Ilosc wszystkich studentow na I roku wynosi: "+ilosc);
+
+        wyswietlMenu(this.opcjeSubMenuWyswietl);
+    }
 }
+

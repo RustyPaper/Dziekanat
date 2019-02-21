@@ -67,12 +67,13 @@ public class Dziekanat {
     public void stworzRocznik(int numerRocznika){
 
         rocznik = new Rocznik(numerRocznika);
+        connect.createTable("rocznik_"+numerRocznika,new String[]{"nazwa_kierunku VARCHAR(255)","prog_wejsciowy INTEGER", "lista_studentow VARCHAR(255)", "lista_przedmiotow VARCHAR(255)","typ_studiow VARCHAR(255)"});
         connect.save(rocznik, NazwyTablic.ROCZNIKI.getNazwa());
     }
 
-    public void stworzPrzedmiot(String nazwaPrzedmiotu, Wykladowca wykladowca, RodzajePrzedmiotow rodzaj){
+    public void stworzPrzedmiot(String nazwaPrzedmiotu, int idWykladowcy, RodzajePrzedmiotow rodzaj){
 
-        przedmiot = new Przedmiot(nazwaPrzedmiotu, wykladowca.getIdWykladowcy(), rodzaj);
+        przedmiot = new Przedmiot(nazwaPrzedmiotu, idWykladowcy, rodzaj);
         int id = connect.save(przedmiot, NazwyTablic.PRZEDMIOTY.getNazwa());
         przedmiot.setId(id);
     }
@@ -99,8 +100,14 @@ public class Dziekanat {
 
        if (this.rocznik == null) throw new Exception("Nie zaladowano rocznika!\n");
 
-       String[] nazwyKierunkow = connect.getColumn("rocznik_"+this.rocznik.getNumerRocznika(),"nazwa_kierunku","");
-       return String.join("\n",nazwyKierunkow);
+       String[][] nazwyKierunkow = connect.getColumn("rocznik_"+this.rocznik.getNumerRocznika(),new String[]{"nazwa_kierunku"},"");
+
+       StringBuilder kierunkiNaRoczniku = new StringBuilder();
+
+       for(String[] nazwa : nazwyKierunkow)
+           kierunkiNaRoczniku.append(nazwa[0]).append("\n");
+
+       return kierunkiNaRoczniku.toString();
 
     }
 
@@ -112,27 +119,25 @@ public class Dziekanat {
     }
 
     public String wyswietlStudenta(){
-        StringBuilder wynik = new StringBuilder();
-        wynik.append("Imie: ").append(student.getImie()).append("\n");
-        wynik.append("Nazwisko: ").append(student.getNazwisko()).append("\n");
-        wynik.append("Adres: ").append(student.getAdresZamieszkania()).append("\n");
-        wynik.append("PESEL: ").append(student.getPesel()).append("\n");
-        wynik.append("email: ").append(student.getEmail()).append("\n");
-        wynik.append("Numer telefonu: ").append(student.getNumerTelefonu()).append("\n");
-        wynik.append("Numer indeksu: ").append(student.getNumerIndeksu()).append("\n");
 
-        return wynik.toString();
+        return "Imie: " + student.getImie() + "\n" +
+                "Nazwisko: " + student.getNazwisko() + "\n" +
+                "Adres: " + student.getAdresZamieszkania() + "\n" +
+                "PESEL: " + student.getPesel() + "\n" +
+                "email: " + student.getEmail() + "\n" +
+                "Numer telefonu: " + student.getNumerTelefonu() + "\n" +
+                "Numer indeksu: " + student.getNumerIndeksu() + "\n";
     }
     public String wyswietlKierunekStudiow() throws Exception {
 
         if (this.kierunekStudiow == null) throw new Exception("Nie wybrano kierunku!");
 
         StringBuilder wynik = new StringBuilder();
-        wynik.append("Nazwa kierunku: ").append(kierunekStudiow.getNazwaKierunku()).append("\n");
-        wynik.append("Prog wejsciowy: ").append(kierunekStudiow.getProgWejsciowy()).append("\n");
+        wynik.append("Nazwa kierunku: ").append(this.kierunekStudiow.getNazwaKierunku()).append("\n");
+        wynik.append("Prog wejsciowy: ").append(this.kierunekStudiow.getProgWejsciowy()).append("\n");
         for (Integer indeks: kierunekStudiow.getListaStudentow()){
             this.student = new Student();
-            connect.laduj(this.student, NazwyTablic.STUDENCI.getNazwa(), "WHERE numer_indeksu = '"+indeks+"'");
+            connect.laduj(this.student, NazwyTablic.STUDENCI.getNazwa(), "WHERE id = '"+indeks+"'");
             wynik.append("\t").append(wyswietlStudenta()).append("\n");
         }
 
@@ -143,8 +148,10 @@ public class Dziekanat {
         przedmiot.dodajOcene(ocena);
     }
 
+    //public void wyswietl
+
     public int iloscWszystkichStudentow(){
-       String[] studenci = connect.getColumn(NazwyTablic.STUDENCI.getNazwa(), "imie", "");
+       String[][] studenci = connect.getColumn(NazwyTablic.STUDENCI.getNazwa(), new String[]{"imie"}, "");
 
        return studenci.length;
     }
@@ -157,9 +164,9 @@ public class Dziekanat {
         int sumaStudentow = 0;
         LocalDate data = LocalDate.now();
         int rocznikPierwszy = data.getYear() - 1;
-        String[] nazwyKierunkow = connect.getColumn("rocznik_"+rocznikPierwszy,"nazwa_kierunku","");
-        for (String nazwaKierunku: nazwyKierunkow){
-            connect.laduj(this.kierunekStudiow, "rocznik_"+rocznikPierwszy, "WHERE nazwa_kierunku = '"+nazwaKierunku+"'");
+        String[][] nazwyKierunkow = connect.getColumn("rocznik_"+rocznikPierwszy,new String[]{"nazwa_kierunku"},"");
+        for (String[] nazwaKierunku: nazwyKierunkow){
+            connect.laduj(this.kierunekStudiow, "rocznik_"+rocznikPierwszy, "WHERE nazwa_kierunku = '"+nazwaKierunku[0]+"'");
             sumaStudentow += this.kierunekStudiow.getListaStudentow().size();
         }
 
@@ -206,8 +213,54 @@ public class Dziekanat {
     }
 
     public String wyswietlRoczniki(){
-        String[] roczniki = connect.getColumn(NazwyTablic.ROCZNIKI.getNazwa(),"numer_rocznika", "");
-        return String.join("\n", roczniki);
+        String[][] roczniki = connect.getColumn(NazwyTablic.ROCZNIKI.getNazwa(),new String[]{"numer_rocznika"}, "");
+
+        StringBuilder numeryRocznikow = new StringBuilder();
+
+        for(String[] numerRocznika : roczniki)
+            numeryRocznikow.append(numerRocznika[0]).append("\n");
+
+        return numeryRocznikow.toString();
+    }
+
+    public String wyswietlWykladowcow(){
+        StringBuilder wykladowcy = new StringBuilder();
+
+        String[][] wykladowcyZBazy = connect.getColumn(NazwyTablic.WYKLADOWCY.getNazwa(),new String[]{"id","imie","nazwisko"},"");
+
+        for(String[] identyfikatorWykladowcy: wykladowcyZBazy )
+            wykladowcy.append(identyfikatorWykladowcy[0])
+                    .append(". ").append(identyfikatorWykladowcy[1])
+                    .append(" ").append(identyfikatorWykladowcy[2])
+                    .append("\n");
+
+        return wykladowcy.toString();
+    }
+
+    public String wyswietlWykladowce(int id){
+        connect.laduj(this.wykladowca,NazwyTablic.WYKLADOWCY.getNazwa(),"WHERE id="+id);
+
+        return "Imie: " + this.wykladowca.getImie() + "\n" +
+                "Nazwisko: " + this.wykladowca.getNazwisko() + "\n" +
+                "Adres zamieszkania: " + this.wykladowca.getAdresZamieszkania() + "\n" +
+                "PESEL: " + this.wykladowca.getPesel() + "\n" +
+                "email: " + this.wykladowca.getEmail() + "\n" +
+                "zarobki: " + this.wykladowca.getZarobki() + "\n";
+    }
+
+    public String wyswietlOceny(Integer numerIndeksu){
+
+        StringBuilder wynik = new StringBuilder();
+
+        if(this.kierunekStudiow.getListaOcen() != null)
+            for(Przedmiot przedmiot :this.kierunekStudiow.getListaOcen().get(numerIndeksu)) {
+                wynik.append(przedmiot.getNazwaPrzedmiotu()).append(": ");
+
+                for(double ocena: przedmiot.getOceny())
+                    wynik.append(ocena).append(", ");
+            }
+
+        return wynik.toString();
     }
 
 

@@ -30,9 +30,10 @@ public class Connect {
         String kolumny = "*";
         try {
             if (nazwyKolumn != null){
-                kolumny = String.join(",", nazwyKolumn);
+                kolumny = String.join(", ", nazwyKolumn);
             }
-            this.st = conn.prepareStatement("SELECT "+kolumny+" FROM "+nazwaTablicy+" "+filtr+";");
+            String query = "SELECT "+kolumny+" FROM "+nazwaTablicy+" "+filtr+";";
+            this.st = conn.prepareStatement(query);
             this.resultSet = this.st.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -47,7 +48,8 @@ public class Connect {
             loaderInterface.load(this,this.resultSet);
             this.st.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println("!!! ZLE WPROWADZONE DANE !!! SPROBOJ PONOWNIE !!!");
         }
 
     }
@@ -56,13 +58,19 @@ public class Connect {
         this.laduj(loaderInterface,"rocznik_"+String.valueOf(nazwaTablicy), filtr);
     }
 
-    public String[] getColumn(String nazwaTablicy, String nazwaKolumny, String filtr){
-        this.loadFromDB(nazwaTablicy, new String[]{nazwaKolumny}, filtr);
-        ArrayList<String> wynik = new ArrayList<>();
+    public String[][] getColumn(String nazwaTablicy, String[] nazwaKolumny, String filtr){
+        this.loadFromDB(nazwaTablicy, nazwaKolumny, filtr);
+        ArrayList<String[]> wynik = new ArrayList<>();
+
         try {
             while (this.resultSet.next()) {
 
-                wynik.add(this.resultSet.getString(1));
+                String[] wartosciKolumn = new String[nazwaKolumny.length];
+
+                for(int index=0; index<nazwaKolumny.length;++index)
+                    wartosciKolumn[index] = this.resultSet.getString(index+1);
+
+                wynik.add(wartosciKolumn);
 
             }
             this.st.close();
@@ -70,13 +78,13 @@ public class Connect {
         catch (SQLException e) {
             e.printStackTrace();
         }
-        String[] wynikArr = new String[wynik.size()];
+        String[][] wynikArr = new String[wynik.size()][];
         wynik.toArray(wynikArr);
         return wynikArr;
     }
 
     public int save(IConnect inst, String nazwaTab){
-        String query = "INSERT INTO "+nazwaTab+inst.save()+" RETURNING id";
+        String query = "INSERT INTO "+nazwaTab+" "+inst.save()+" RETURNING id";
         try {
             this.st = conn.prepareStatement(query);
             this.resultSet = this.st.executeQuery();
@@ -88,5 +96,16 @@ public class Connect {
         }
 
         return -1;
+    }
+
+    public void createTable(String name, String[] kolumy){
+        String kol = String.join(",",kolumy);
+        String query = "CREATE TABLE "+name+" (id SERIAL PRIMARY KEY,"+kol+" );";
+        try {
+            this.st = conn.prepareStatement(query);
+            this.st.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

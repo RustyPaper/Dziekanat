@@ -104,6 +104,7 @@ public class KierunekStudiow implements IListaStudentow, IConnect {
         this.setProgWejsciowy(resultSet.getInt(3));
 
         String[] idPrzedmiotow = resultSet.getString(5).split(";");
+
         if(idPrzedmiotow.length > 0) {
             for (String idPrzedmiotu : idPrzedmiotow)
                 this.listaPrzedmiotow.add(Integer.parseInt(idPrzedmiotu));
@@ -115,11 +116,11 @@ public class KierunekStudiow implements IListaStudentow, IConnect {
             this.listaOcen.put(Integer.parseInt(indeks), new ArrayList<>());
             for(int idPrzedmiotu: this.listaPrzedmiotow) {
                 przedmiot = new Przedmiot();
-                String[] listaOcenZBazy = connect.getColumn("oceny","oceny","WHERE numer_indeksu = " + indeks + " AND id_przedmiotu = "+idPrzedmiotu);
+                String[][] listaOcenZBazy = connect.getColumn("oceny",new String[]{"oceny"},"WHERE numer_indeksu = " + indeks + " AND id_przedmiotu = "+idPrzedmiotu);
 
                 connect.laduj(przedmiot, NazwyTablic.PRZEDMIOTY.getNazwa(),"WHERE id = "+idPrzedmiotu);
                 if(listaOcenZBazy.length >0 ) {
-                    przedmiot.setListaOcen(listaOcenZBazy[0].split(";"));
+                    przedmiot.setListaOcen(listaOcenZBazy[0][0].split(";"));
 
                     this.listaOcen.get(Integer.parseInt(indeks)).add(przedmiot);
                 }

@@ -45,20 +45,28 @@ public class Rocznik implements IConnect {
     @Override
     public void load(Connect connect, ResultSet resultSet) throws SQLException {
         this.setNumerRocznika(resultSet.getInt(2));
-        String[] idKierunkow = resultSet.getString(3).split(";");
-        for (String id: idKierunkow){
-            this.listaKierunkow.add(Integer.parseInt(id));
-        }
+        String idKierunkow = resultSet.getString(3);
+        if(idKierunkow != null)
+            for (String id: idKierunkow.split(";")){
+                this.listaKierunkow.add(Integer.parseInt(id));
+            }
     }
 
     @Override
     public String save() {
         StringBuilder queryWartosci = new StringBuilder();
         queryWartosci.append("(numer_rocznika, lista_kierunkow) VALUES(");
-        queryWartosci.append("'"+this.getNumerRocznika()+"',");
-        for (int indeks: getListaKierunkow()){
-            queryWartosci.append("'"+indeks+"',");
-        }
+        queryWartosci.append(this.getNumerRocznika()).append(",");
+
+        StringBuilder listaKierunkow = new StringBuilder();
+        if(getListaKierunkow().size() > 0)
+             for (int indeks: getListaKierunkow()){
+                listaKierunkow.append(indeks).append(";");
+             }
+        else
+            listaKierunkow.append("''");
+
+        queryWartosci.append(listaKierunkow.toString());
         queryWartosci.append(")");
 
         return queryWartosci.toString();

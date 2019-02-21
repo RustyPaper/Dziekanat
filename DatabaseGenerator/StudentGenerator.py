@@ -111,7 +111,7 @@ def main():
         address = random_address()
         email = random_email(name[0], name[1])
         phone = random_phone()
-        query = "INSERT INTO Studenci (imie, nazwisko, adres_zamieszkania, pesel, email, numer_telefonu) VALUES('{}', '{}', '{}', '{}', '{}', '{}');".format(name[0],name[1],address,pesel, email, phone)
+        query = "INSERT INTO wykladowcy (imie, nazwisko, adres_zamieszkania, pesel, email) VALUES('{}', '{}', '{}', '{}', '{}');".format(name[0],name[1],address,pesel, email)
         cursor.execute(query)
 
     for user in result:
@@ -120,4 +120,3 @@ def main():
     close_db()
 if __name__ == '__main__':
     main()
-
