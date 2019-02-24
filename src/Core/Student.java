@@ -111,7 +111,7 @@ public class Student implements IConnect {
         queryWartosci.append("'"+this.getPesel()+"',");
         queryWartosci.append("'"+this.getEmail()+"',");
         queryWartosci.append("'"+this.getNumerTelefonu()+"',");
-        queryWartosci.append("'"+this.getNumerIndeksu()+"',");
+        queryWartosci.append("'"+this.getNumerIndeksu()+"'");
         queryWartosci.append(")");
 
         return queryWartosci.toString();
