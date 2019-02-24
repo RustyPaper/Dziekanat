@@ -158,22 +158,25 @@ public class Dzik {
 
     private void zapiszKierunek(){
         this.czytnik.nextLine();
-        System.out.println("\nPodaj nazwe kierunku: ");
+        System.out.print("\nPodaj nazwe kierunku: ");
         String nazwaKierunku = this.czytnik.nextLine();
 
-        System.out.println("\nPodaj prog wejsciowy: ");
+        System.out.print("\nPodaj prog wejsciowy: ");
         int progWejsciowy = this.czytnik.nextInt();
 
         this.czytnik.nextLine();
         wybierzTypStudiow();
-        System.out.print("\nWpisz Typ Studiow");
+        System.out.print("\nWpisz Typ Studiow: ");
         String typStudiow = this.czytnik.nextLine();
 
-        dziekanat.stworzKierunekStudiow(nazwaKierunku,progWejsciowy,TypStudiow.valueOf(typStudiow));
 
+        try {
+            dziekanat.stworzKierunekStudiow(nazwaKierunku,progWejsciowy,TypStudiow.valueOf(typStudiow));
+            dziekanat.dodajKierunekDoRocznika();
+        } catch (Exception e){
+            System.out.println(e.toString());
 
-
-        dziekanat.dodajKierunekDoRocznika();
+        }
         wyswietlMenu(this.opcjeSubMenuZapisz);
     }
 

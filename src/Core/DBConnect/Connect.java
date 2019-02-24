@@ -84,7 +84,7 @@ public class Connect {
     }
 
     public int save(IConnect inst, String nazwaTab){
-        String query = "INSERT INTO "+nazwaTab+" "+inst.save()+" RETURNING id";
+        String query = "INSERT INTO "+nazwaTab+" "+inst.save()+" RETURNING id;";
         try {
             this.st = conn.prepareStatement(query);
             this.resultSet = this.st.executeQuery();

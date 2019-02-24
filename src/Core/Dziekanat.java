@@ -58,7 +58,9 @@ public class Dziekanat {
 
     public void stworzKierunekStudiow(String nazwaKierunku,
                                       int progWejsciowy,
-                                      TypStudiow typStudiow){
+                                      TypStudiow typStudiow) throws Exception{
+
+        if(this.rocznik == null ) throw new Exception("!!! Nie wybrano rocznika !!!");
 
         kierunekStudiow = new KierunekStudiow(nazwaKierunku, progWejsciowy, typStudiow);
 
@@ -78,10 +80,11 @@ public class Dziekanat {
         przedmiot.setId(id);
     }
 
-    public void dodajKierunekDoRocznika(){
-        rocznik.dodajKierunek(this.kierunekStudiow.getIdKierunku());
+    public void dodajKierunekDoRocznika() throws Exception{
+        if(this.rocznik == null ) throw new Exception("!!! Nie wybrano rocznika !!!");
         int id = connect.save(this.kierunekStudiow, "rocznik_"+ this.rocznik.getNumerRocznika());
         this.kierunekStudiow.setIdKierunku(id);
+        rocznik.dodajKierunek(id);
     }
 
     public void getRocznik(int numerRocznika){
