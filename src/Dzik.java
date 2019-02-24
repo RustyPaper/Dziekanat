@@ -14,7 +14,7 @@ public class Dzik {
             new opcjaMenu(2, "zapisz", ()->this.wyswietlMenu(this.opcjeSubMenuZapisz)),
             new opcjaMenu(3, "wyswietl", ()->this.wyswietlMenu(this.opcjeSubMenuWyswietl)),
             new opcjaMenu(4, "wyszukaj", ()->this.wyswietlMenu(this.opcjeSubMenuWyszukaj)),
-            new opcjaMenu(4, "Zakoncz", null)
+            new opcjaMenu(5, "Zakoncz", null)
     };
 
     private final opcjaMenu[] opcjeSubMenuWyswietl = {

@@ -46,7 +46,7 @@ public class Rocznik implements IConnect {
     public void load(Connect connect, ResultSet resultSet) throws SQLException {
         this.setNumerRocznika(resultSet.getInt(2));
         String idKierunkow = resultSet.getString(3);
-        if(idKierunkow != null)
+        if(idKierunkow != null && !idKierunkow.equals(""))
             for (String id: idKierunkow.split(";")){
                 this.listaKierunkow.add(Integer.parseInt(id));
             }
