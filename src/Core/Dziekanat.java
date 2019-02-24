@@ -178,6 +178,7 @@ public class Dziekanat {
         int rocznikPierwszy = data.getYear() - 1;
         String[][] nazwyKierunkow = connect.getColumn("rocznik_"+rocznikPierwszy,new String[]{"nazwa_kierunku"},"");
         for (String[] nazwaKierunku: nazwyKierunkow){
+            this.kierunekStudiow = new KierunekStudiow();
             connect.laduj(this.kierunekStudiow, "rocznik_"+rocznikPierwszy, "WHERE nazwa_kierunku = '"+nazwaKierunku[0]+"'");
             sumaStudentow += this.kierunekStudiow.getListaStudentow().size();
         }
