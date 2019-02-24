@@ -99,11 +99,11 @@ public class KierunekStudiow implements IListaStudentow, IConnect {
 
     @Override
     public void load(Connect connect, ResultSet resultSet) throws SQLException {
-        this.setIdKierunku(resultSet.getInt(1));
-        this.setNazwaKierunku(resultSet.getString(2));
-        this.setProgWejsciowy(resultSet.getInt(3));
+        this.setIdKierunku(resultSet.getInt(6));
+        this.setNazwaKierunku(resultSet.getString(1));
+        this.setProgWejsciowy(resultSet.getInt(2));
 
-        String przedmioty = resultSet.getString(5);
+        String przedmioty = resultSet.getString(4);
 
         if(przedmioty != null) {
             if(przedmioty.length() > 0) {
@@ -112,20 +112,25 @@ public class KierunekStudiow implements IListaStudentow, IConnect {
                     this.listaPrzedmiotow.add(Integer.parseInt(idPrzedmiotu));
             }
         }
-        String[] indeksyStudentow = resultSet.getString(4).split(";");
-        Przedmiot przedmiot;
-        for (String indeks: indeksyStudentow){
-            this.listaStudentow.add(Integer.parseInt(indeks));
-            this.listaOcen.put(Integer.parseInt(indeks), new ArrayList<>());
-            for(int idPrzedmiotu: this.listaPrzedmiotow) {
-                przedmiot = new Przedmiot();
-                String[][] listaOcenZBazy = connect.getColumn("oceny",new String[]{"oceny"},"WHERE numer_indeksu = " + indeks + " AND id_przedmiotu = "+idPrzedmiotu);
+        String studenci = resultSet.getString(3);
+        if(studenci != null) {
+            if(studenci.length() > 0) {
+                String[] indeksyStudentow = studenci.split(";");
+                Przedmiot przedmiot;
+                for (String indeks : indeksyStudentow) {
+                    this.listaStudentow.add(Integer.parseInt(indeks));
+                    this.listaOcen.put(Integer.parseInt(indeks), new ArrayList<>());
+                    for (int idPrzedmiotu : this.listaPrzedmiotow) {
+                        przedmiot = new Przedmiot();
+                        String[][] listaOcenZBazy = connect.getColumn("oceny", new String[]{"oceny"}, "WHERE numer_indeksu = " + indeks + " AND id_przedmiotu = " + idPrzedmiotu);
 
-                connect.laduj(przedmiot, NazwyTablic.PRZEDMIOTY.getNazwa(),"WHERE id = "+idPrzedmiotu);
-                if(listaOcenZBazy.length >0 ) {
-                    przedmiot.setListaOcen(listaOcenZBazy[0][0].split(";"));
+                        connect.laduj(przedmiot, NazwyTablic.PRZEDMIOTY.getNazwa(), "WHERE id = " + idPrzedmiotu);
+                        if (listaOcenZBazy.length > 0) {
+                            przedmiot.setListaOcen(listaOcenZBazy[0][0].split(";"));
 
-                    this.listaOcen.get(Integer.parseInt(indeks)).add(przedmiot);
+                            this.listaOcen.get(Integer.parseInt(indeks)).add(przedmiot);
+                        }
+                    }
                 }
             }
         }
@@ -137,10 +142,25 @@ public class KierunekStudiow implements IListaStudentow, IConnect {
         queryWartosci.append("(nazwa_kierunku, prog_wejsciowy, lista_studentow, lista_przedmiotow, typ_studiow) VALUES(");
         queryWartosci.append("'"+this.getNazwaKierunku()+"',");
         queryWartosci.append("'"+this.getProgWejsciowy()+"',");
-        for (int indeks: getListaStudentow()){
-            queryWartosci.append("'"+indeks+"',");
-        }
-        queryWartosci.append(")");
+
+            StringBuilder listaStudentowString = new StringBuilder();
+            listaStudentowString.append("'");
+            for (int indeks : getListaStudentow()) {
+                listaStudentowString.append(indeks).append(";");
+            }
+            queryWartosci.append(listaStudentowString.toString());
+            queryWartosci.append("',");
+
+            queryWartosci.append("'");
+            StringBuilder listaPRzedmiotowString = new StringBuilder();
+            for(int idPrzedmiotu: this.listaPrzedmiotow){
+                listaPRzedmiotowString.append(idPrzedmiotu).append(";");
+            }
+            queryWartosci.append(listaPRzedmiotowString.toString());
+            queryWartosci.append("',");
+
+            queryWartosci.append("'").append(this.typStudiow.toString()).append("'");
+            queryWartosci.append(")");
 
         return queryWartosci.toString();
     }
