@@ -5,6 +5,8 @@ import Core.Interface.IConnect;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Student implements IConnect {
 
@@ -92,6 +94,7 @@ public class Student implements IConnect {
 
     @Override
     public void load(Connect connect, ResultSet resultSet) throws SQLException {
+        
         this.setImie(resultSet.getString(2));
         this.setNazwisko(resultSet.getString(3));
         this.setAdresZamieszkania(resultSet.getString(4));
@@ -103,17 +106,18 @@ public class Student implements IConnect {
 
     @Override
     public String save() {
-        StringBuilder queryWartosci = new StringBuilder();
-        queryWartosci.append("(imie, nazwisko, adres_zamieszkania, pesel, email, numer_telefonu, numer_indeksu) VALUES(");
-        queryWartosci.append("'"+this.getImie()+"',");
-        queryWartosci.append("'"+this.getNazwisko()+"',");
-        queryWartosci.append("'"+this.getAdresZamieszkania()+"',");
-        queryWartosci.append("'"+this.getPesel()+"',");
-        queryWartosci.append("'"+this.getEmail()+"',");
-        queryWartosci.append("'"+this.getNumerTelefonu()+"',");
-        queryWartosci.append("'"+this.getNumerIndeksu()+"'");
-        queryWartosci.append(")");
-
-        return queryWartosci.toString();
+        List<String> queryWartosci = new ArrayList<>();
+        
+        queryWartosci.add("(imie, nazwisko, adres_zamieszkania, pesel, email, numer_telefonu, numer_indeksu) VALUES(");
+        queryWartosci.add(this.getImie());
+        queryWartosci.add(this.getNazwisko());
+        queryWartosci.add(this.getAdresZamieszkania());
+        queryWartosci.add(Long.toString(getPesel()));
+        queryWartosci.add(this.getEmail());
+        queryWartosci.add(Integer.toString(this.getNumerTelefonu()));
+        queryWartosci.add(Integer.toString(this.getNumerIndeksu()));
+        queryWartosci.add(")");
+        
+        return queryWartosci.stream().reduce("", (val1,val2)->"'"+val1+", "+val2+"'");
     }
 }

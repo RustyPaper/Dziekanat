@@ -2,3 +2,4 @@
 out/
 DatabaseGenerator/configDB.json
 .DS_Store
+.vscode
